@@ -1,0 +1,82 @@
+{% load static %}
+{% load json_extras %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Parsed Resume Results</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="{% static 'parserapp/styles.css' %}">
+  <link rel="icon" href="{% static 'parserapp/favicon.ico' %}">
+</head>
+<body>
+  <video autoplay loop muted playsinline id="bg-video">
+    <source src="/static/parserapp/images/c.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+</video>
+  <div class="container-fluid py-4">
+    <h1 class="text-center mb-4 text-white">Parsed Resume Results</h1>
+    <div class="table-responsive">
+      <table class="table table-dark table-hover">
+        <thead>
+          <tr>
+            <th><input type="checkbox" id="select-all" onclick="checkAll()"></th>
+            <th>#</th>
+            <th>Candidate Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Experience</th>
+            <th>Year of Experience</th>
+            <th>Degree</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for result in results %}
+          <tr>
+            <td><input type="checkbox" name="select_candidate" value="{{ forloop.counter }}"></td>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ result.personalDetails.name }}</td>
+            <td>{{ result.personalDetails.contactInfo.email|join:", " }}</td>
+            <td>{{ result.personalDetails.contactInfo.phone|join:", " }}</td>
+            <td>{{ result.experience }}</td>
+            <td>{{ result.total_exps }}</td>
+            <td>{{ result.first_degree }}</td>
+            <td>
+              <button type="button" class="btn btn-sm btn-light text-dark shadow-sm" data-result='{{ result|tojson }}' onclick="showCandidateModal(this)">View</button>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="10" class="text-center text-white">No resumes found.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div class="text-center mt-3">
+      <a href="{% url 'download_excel' %}" class="btn btn-success btn-lg">Download as Excel</a>
+    </div>
+  </div>
+
+  <!-- Candidate Profile Modal (Glassy Effect) -->
+  <div id="candidateModal" class="modal fade" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content glass-modal text-white">
+        <div class="modal-header border-0">
+          <h5 class="modal-title">Candidate Profile Details</h5>
+          <button type="button" class="btn-close btn-close-white" aria-label="Close" onclick="closeCandidateModal()"></button>
+        </div>
+        <div class="modal-body" id="candidateDetails"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS Bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Custom Scripts -->
+  <script src="{% static 'parserapp/scripts.js' %}"></script>
+</body>
+</html>
